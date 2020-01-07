@@ -92,8 +92,8 @@ func sendRequest(dest string) {
 func offload() {
 	// Get file list in photo folder
 	getFile()
-	for i := 1; i <= 10; i++ {
-		time.Sleep(500 * time.Millisecond)
+	for i := 1; i <= 1; i++ {
+		time.Sleep(1000 * time.Millisecond)
 		go sendRequest("http://127.0.0.1:8888/upload")
 	}
 }
