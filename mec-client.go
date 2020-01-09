@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,11 +11,29 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // File list
 var files []string
+
+// Result to parse result and display
+type Result struct {
+	Status      string
+	TotalTime   string
+	TotalImages int
+	Data        []ImageResult
+}
+
+// Gateway API server
+var gateway = "http://127.0.0.1:8888/upload"
+
+// ImageResult to parse result for each image
+type ImageResult struct {
+	ImageName  string
+	TotalFaces int
+	Face       []string
+	Time       string
+}
 
 // Creates a new file upload http request with optional extra params
 func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
@@ -92,22 +111,31 @@ func sendRequest(dest string) {
 func offload() {
 	// Get file list in photo folder
 	getFile()
-	for i := 1; i <= 1; i++ {
-		time.Sleep(1000 * time.Millisecond)
-		go sendRequest("http://127.0.0.1:8888/upload")
-	}
+	go sendRequest(gateway)
+	// for i := 1; i <= 1; i++ {
+	// 	time.Sleep(1000 * time.Millisecond)
+	// 	go sendRequest("http://127.0.0.1:8888/upload")
+	// }
 }
 
 // Receiving Result
 func receiveResult(w http.ResponseWriter, r *http.Request) {
-	// body, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// r.Body.Close()
-	fmt.Println(">>>>> File " + r.Header.Get("X-File-Name") + ": Offload Completed! Received result")
-	//fmt.Println(string(body))
-	//log.Println(string(body))
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.Body.Close()
+	fmt.Println("\n ________________________________________")
+	fmt.Println("\n >>>>> File " + r.Header.Get("X-File-Name") + ": Offload Completed! Received result")
+	var result Result
+	json.Unmarshal(body, &result)
+	var imageresult []ImageResult
+	imageresult = result.Data
+	//for l := range result {
+	//fmt.Printf("Total time = %v", result.TotalTime)
+	for _, r := range imageresult {
+		fmt.Printf(" ++ Image have %v face(s), completed in %v", r.TotalFaces, r.Time)
+	}
 }
 
 // Main function
