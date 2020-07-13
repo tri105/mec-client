@@ -25,7 +25,7 @@ type Result struct {
 }
 
 // Gateway API server
-var gateway = "http://127.0.0.1:8888/upload"
+var gateway = "http://127.0.0.1:8080/function/faas-pigo"
 
 // ImageResult to parse result for each image
 type ImageResult struct {
@@ -102,7 +102,7 @@ func sendRequest(dest string) {
 			fmt.Println("---------Sucessful uploaded photo, waiting for processing---------")
 			fmt.Println(resp.StatusCode)
 			//fmt.Println(resp.Header)
-			//fmt.Println(body)
+			fmt.Println(body)
 		}
 	}
 }
@@ -114,7 +114,7 @@ func offload() {
 	go sendRequest(gateway)
 	// for i := 1; i <= 1; i++ {
 	// 	time.Sleep(1000 * time.Millisecond)
-	// 	go sendRequest("http://127.0.0.1:8888/upload")
+	// 	go sendRequest(gateway)
 	// }
 }
 
